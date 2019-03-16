@@ -8,7 +8,7 @@ var path = require('path');
 var app = require('../../app.js');
 var db = require('../../data/db.js');
 
-app.http.put('/api/deployed/register/:uuid', (req, res) => //handle registering a new device from a keylist
+app.http.put('/api/register/:uuid', (req, res) => //handle registering a new device from a keylist
 { 
     let keyPos = checkKeys(req.params.uuid);
 

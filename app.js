@@ -13,6 +13,6 @@ http.listen(port, () => {console.log(`Starting HTTP server on port ${port}`)});
 exports.http = http;
 
 /* Start Load API Modules */
-require("./api/deployed/registered.js");
+require("./api/deployed/activated.js");
 require("./api/deployed/register.js");
 /* End Loading API Modules*/
