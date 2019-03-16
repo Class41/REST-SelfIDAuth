@@ -1,0 +1,28 @@
+{
+  "name": "rest-selfidauth",
+  "version": "1.0.0",
+  "description": "a simple REST based authentication service for individual deployed devices to self identify to a server",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Class41/REST-SelfIDAuth.git"
+  },
+  "keywords": [
+    "REST",
+    "SelfID",
+    "Database"
+  ],
+  "author": "Vasyl Onufriyev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Class41/REST-SelfIDAuth/issues"
+  },
+  "homepage": "https://github.com/Class41/REST-SelfIDAuth#readme",
+  "dependencies": {
+    "express": "^4.16.4",
+    "nodemon": "^1.18.10"
+  }
+}
