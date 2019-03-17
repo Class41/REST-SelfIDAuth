@@ -6,9 +6,11 @@
 
 const express = require('express');
 const http = express();
+const bodyParser = require('body-parser');
 const port = process.env.PORT || 3669; //Checks envrionment variable for easy cluster deployment
 
-http.listen(port, () => {console.log(`Starting HTTP server on port ${port}`)});
+http.use(bodyParser.json());
+http.listen(port, '192.168.0.8', () => {console.log(`Starting HTTP server on port ${port}`)});
 
 exports.http = http;
 
