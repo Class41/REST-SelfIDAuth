@@ -6,6 +6,7 @@ REST-SelfIDAuth designed for physical clients to be deployed, then connect and c
 
 ### /api/activated
 ***
+
 ```
 /api/activated/{uuid}
 
@@ -14,11 +15,13 @@ PUT - Update IP of requested client (manually specified via JSON in body)
 DELETE - Deactivates selected UUID
 ```
 
+
 ```
-/api/activated/:uuid/ip
+/api/activated/{uuid}/ip
 
 PUT - Automatically detects and sets IP of requesting client
 ```
+
 
 ```
 /api/activated/{uuid}/firmware
@@ -26,10 +29,12 @@ PUT - Automatically detects and sets IP of requesting client
 GET - Returns current firmware version + firmware URL
 ```
 
+
 ### /api/register
 ***
+
 ```
-/api/register/:uuid
+/api/register/{uuid}
 
 PUT - Registers client from keyset with current IP
 ```
