@@ -8,11 +8,6 @@ var path = require('path');
 var app = require('../../app.js');
 var db = require('../../data/db.js');
 /* get */
-app.http.get('/api/activated', (req, res) => //handle an empty reqest to /api/deployed
-{
-    return res.status(400).send('Invalid Request');
-});
-
 app.http.get('/api/activated/:uuid', (req, res) => //handle returning information about a specific UUID
 {
     const deployEntry = searchDeployments(req.params.uuid);
