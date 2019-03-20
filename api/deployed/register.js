@@ -4,7 +4,6 @@
 * Purpose: HTTP server API module -- handles registering unregistered devices from a keylist
 */
 
-var path = require('path');
 var app = require('../../app.js');
 var db = require('../../data/db.js');
 

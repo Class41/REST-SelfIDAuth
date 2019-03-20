@@ -4,7 +4,6 @@
 * Purpose: HTTP server API module -- handles info requests for registered clients
 */
 
-var path = require('path');
 var app = require('../../app.js');
 var db = require('../../data/db.js');
 /* get */
@@ -14,7 +13,7 @@ app.http.get('/api/activated/:uuid', (req, res) => //handle returning informatio
 
     if(!deployEntry)
         return res.status(400).send('Invalid UUID');
-    
+
     res.write(JSON.stringify(deployEntry));
     res.end();
 });
@@ -38,7 +37,11 @@ app.http.put('/api/activated/:uuid/ip', (req, res) => //handle updating existing
     if(deployId < 0)
         return res.status(400).send('Invalid UUID');
 
-    db.deployed[deployId].ip = req.ip;
+    app.mutex.take(function() {
+        db.deployed[deployId].ip = req.ip;
+        app.mutex.leave();
+    });
+
     res.send('TRUE');
 });
 
@@ -53,8 +56,11 @@ app.http.put('/api/activated/:uuid', (req, res) => //handle updating existing ac
         let ipReg = new RegExp("^([0-9]{1,3}\.){3}[0-9]{1,3}$").exec(req.body.ip).index;
 
         if(ipReg >= 0)
-        {      
-            db.deployed[deployId].ip = req.body.ip;
+        {
+            app.mutex.take(function() {
+                db.deployed[deployId].ip = req.body.ip;
+                app.mutex.leave();
+            });                
             res.send('TRUE');
         }
         else res.send('FALSE');
@@ -73,7 +79,11 @@ app.http.delete('/api/activated/:uuid', (req, res) => //handle deactivating acti
     if(deployId < 0)
         return res.status(400).send('Invalid UUID');
 
-    db.deployed[deployId].flag = -1;
+    app.mutex.take(function() {
+        db.deployed[deployId].flag = -1;
+        app.mutex.leave();
+    });
+    
     res.send('TRUE');
 });
 
