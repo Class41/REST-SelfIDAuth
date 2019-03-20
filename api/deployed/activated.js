@@ -10,7 +10,6 @@ class Activated {
         /* get */
         http.get('/api/activated/:uuid', (req, res) => //handle returning information about a specific UUID
         {
-            console.log(process.pid);
             const deployEntry = this.searchDeployments(req.params.uuid, db);
 
             if (!deployEntry)
@@ -97,6 +96,7 @@ class Activated {
     {
         return db.deployed.find(data => (data.UUID == uuid && data.flag != -1));
     }
+
 }
 
 module.exports = Activated;
