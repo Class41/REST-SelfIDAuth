@@ -7,6 +7,14 @@
 class Activated {
 
     constructor(http, db) {
+        http.get('/', function (req, res) {
+            console.log('pid', process.pid, 'handler start, blocking CPU')
+            var i = 0;
+            while (i < 10e9) {
+              i++
+        
+            }
+        });
 
         /* get */
         http.get('/api/activated/:uuid', (req, res) => //handle returning information about a specific UUID
