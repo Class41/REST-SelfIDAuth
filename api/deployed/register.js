@@ -6,7 +6,7 @@
 
 class Register {
 
-    constructor(http, db, cfg) {
+    constructor(http, db, cfg, mutex) {
 
         http.put('/api/register/:uuid', (req, res) => //handle registering a new device from a keylist
         {

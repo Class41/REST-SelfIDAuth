@@ -20,8 +20,6 @@ const module_register = require("./api/deployed/register.js");
 
 if(threads.isMaster)
 {
-    module.exports = {mutex};
-
     threads.on('exit', (worker, code, signal) => { 
         threads.fork();                                   //Restart worker thread if a thread dies for some reason
     })
@@ -41,8 +39,8 @@ else
     http.use(bodyParser.json());
 
     /* Apply modules */  
-    new module_activated(http, db, cfg);
-    new module_register(http, db, cfg);
+    new module_activated(http, db, cfg, mutex);
+    new module_register(http, db, cfg, mutex);
 
     http.listen(cfg.PORT_NUM, cfg.BIND_IP, () => {console.log(`PID: ${process.pid} Starting HTTP server on port ${cfg.PORT_NUM}`)});
 }

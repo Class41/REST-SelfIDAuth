@@ -6,11 +6,11 @@
 
 class Activated {
 
-    constructor(http, db, cfg) {
+    constructor(http, db, cfg, mutex) {
         /* get */
         http.get('/api/activated/:uuid', (req, res) => //handle returning information about a specific UUID
         {
-            this.searchDeployments(req.params.uuid, db, cfg, (deployEntry) => {
+           Activated.searchDeployments(req.params.uuid, db, cfg, (deployEntry) => {
                 if (!deployEntry)
                     return res.status(400).send('Invalid UUID');
 
@@ -21,7 +21,7 @@ class Activated {
 
         http.get('/api/activated/:uuid/firmware', (req, res) => //handle a UUID checking firmware version. Returns firmwareID + URL to firmware
         {
-            this.searchDeployments(req.params.uuid, db, cfg, (deployEntry) => {
+           Activated.searchDeployments(req.params.uuid, db, cfg, (deployEntry) => {
                 if (!deployEntry)
                     return res.status(400).send('Invalid UUID');
             
@@ -33,33 +33,38 @@ class Activated {
         /* put */
         http.put('/api/activated/:uuid/ip', (req, res) => //handle updating existing activated units -> ip in particular, automatically detect IP
         {
-            this.searchDeployments(req.params.uuid, db, cfg, (deployEntry) => {
-                if (!deployEntry)
+           Activated.searchDeployments(req.params.uuid, db, cfg, (deployEntry) => {
+                if (!deployEntry || deployEntry.flag == -1)
                     return res.status(400).send('Invalid UUID');
 
-                app.mutex.take(function () {
-                    db.deployed[deployId].ip = req.ip;
-                    app.mutex.leave();
-                });
-
-                res.send('TRUE');                
+                mutex.take(function () {
+                    Activated.updateDeployment(req.params.uuid, db, cfg, { $set: { ip: req.ip } }, (result) => { 
+                        if(result.modifiedCount)
+                            res.send('TRUE');
+                        else
+                            res.send('FALSE');
+                            
+                        mutex.leave();
+                        return;
+                    });
+                });                
             });
         });
         
 
         http.put('/api/activated/:uuid', (req, res) => //handle updating existing activated units -> ip in particular, manually specify IP in JSON
         {
-            this.searchDeployments(req.params.uuid, db, cfg, (deployEntry) => {
-                if (!deployEntry)
+           Activated.searchDeployments(req.params.uuid, db, cfg, (deployEntry) => {
+                if (!deployEntry || deployEntry.flag == -1)
                     return res.status(400).send('Invalid UUID');
 
                 try {
                     let ipReg = new RegExp("^([0-9]{1,3}\.){3}[0-9]{1,3}$").exec(req.body.ip).index;
 
                     if (ipReg >= 0) {
-                        app.mutex.take(function () {
+                        mutex.take(function () {
                             db.deployed[deployId].ip = req.body.ip;
-                            app.mutex.leave();
+                            mutex.leave();
                         });
                         res.send('TRUE');
                     }
@@ -73,14 +78,14 @@ class Activated {
 
         /* delete */
         http.delete('/api/activated/:uuid', (req, res) => //handle deactivating activated units
-        {
-            this.searchDeployments(req.params.uuid, db, cfg, (deployEntry) => {
-                if (!deployEntry)
+        {qqerd
+           Activated.searchDeployments(req.params.uuid, db, cfg, (deployEntry) => {
+                if (!deployEntry || deployEntry.flag == -1)
                     return res.status(400).send('Invalid UUID');
 
-                app.mutex.take(function () {
+                mutex.take(function () {
                     db.deployed[deployId].flag = -1;
-                    app.mutex.leave();
+                    mutex.leave();
                 });
 
                 res.send('TRUE');
@@ -88,15 +93,15 @@ class Activated {
         });
     }
 
-    searchDeploymentsId(uuid, db, cfg, callback) //check deployment list and determine uuid position
+    static updateDeployment(uuid, db, cfg, values, callback) //check deployment list and determine uuid position
     {
-        if(cfg.DB_MODE == 'Mongo')
-            return db.mongoFind('deployed', { 'uuid':uuid });
+        if(cfg.DB_MODE == 'Mock')
+            throw 'Mock not supported for this operation.';
 
-        return db.deployed.findIndex(data => (data.UUID == uuid && data.flag != -1));
+        db.mongoUpdate('deployed', { UUID: uuid }, values).then((res) => { callback(res); });
     }
 
-    searchDeployments(uuid, db, cfg, callback) //check deployment list to verify legitimacy of connecting party
+    static searchDeployments(uuid, db, cfg, callback) //check deployment list to verify legitimacy of connecting party
     {
         if(cfg.DB_MODE == 'Mongo')            
             db.mongoFind('deployed', { UUID: uuid })
