@@ -8,7 +8,10 @@
 const threads = require('cluster');
 const mutex = require('semaphore')(1);
 const cfg = require('./cfg/configure.js');
-const db = require('./data/db.js');
+const db = (cfg.DB_MODE == 'Mock') ? require('./data/db_mock') : require('./data/db');
+
+/* Use this DB instead if you wish to just use a mock database instead */
+//const db = require('./data/db_mock.js');
 
  /* Start Load API Modules */  
 const module_activated = require("./api/deployed/activated.js");
@@ -38,8 +41,8 @@ else
     http.use(bodyParser.json());
 
     /* Apply modules */  
-    new module_activated(http, db);
-    new module_register(http, db);
+    new module_activated(http, db, cfg);
+    new module_register(http, db, cfg);
 
     http.listen(cfg.PORT_NUM, cfg.BIND_IP, () => {console.log(`PID: ${process.pid} Starting HTTP server on port ${cfg.PORT_NUM}`)});
 }

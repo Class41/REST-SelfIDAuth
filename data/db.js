@@ -1,24 +1,26 @@
-/*
-* Author: Vasyl Onufriyev
-* Date: 3-15-2019
-* Purpose: Mock "Database" as a proof of concept
-*/
+var { MongoClient } = require('mongodb');
+var cfg = require('../cfg/configure.js');
 
-const firmare = {'currentVersion':'1.0.0.1', 'url':'www.google.com', 'launchop':'--updatecheck 60'}; //keeps track of firmware version/URL for firmware
+function mongoFind(collection, filter)
+{
+    return new Promise((res) => { //return promise 
+        MongoClient.connect(cfg.DB_CONN_STRING, { useNewUrlParser: true }, (err, conn) => { //connect using the mongo connect string   
+            if(err)
+                throw err;
 
-var deployed = [ //keeps track of deployed machine IDs and their IPs
-                {'id':'0', 'UUID':'NjedYrZSTPKRpPytOVQ4uxOsEP2kUqes', 'ip':'223.54.168.18', 'flag':null},
-                {'id':'1', 'UUID':'Q9h8Snpqw0QWijgRRLuKokixayGSXBso', 'ip':'26.236.19.187', 'flag':null},
-                {'id':'2', 'UUID':'4I73K4lT0RuU7FtbpTGsMNqZTc1Os7cf', 'ip':'94.227.218.68', 'flag':null},
-                {'id':'3', 'UUID':'uliWHXaNAEmtQxP943kC6aPFNkB89tJb', 'ip':'245.165.152.187', 'flag':null}
-                ]
+            let db = conn.db(cfg.DB_NAME); //open the specified database. Change this in cfg/configure.js
 
-var keyset = [ //Keylist of systems that have yet to connect yet and deploy
-                't1kkzVUGoebS0yavApTiQEr9lQ2Jw4G0',
-                'YabG9CdIz6JAC19RSZJtVoY6Dz93tEvT',
-                'uSttetVj3V0LOQDZvPQzl3Oas2cIHepA'
-                ]
+            db.collection(collection).findOne(filter, (err, result) => { //find result, return the value async
+                if (err) 
+                    throw err;
 
-module.exports.firmare = firmare;
-module.exports.deployed = deployed;
-module.exports.keyset = keyset;
+                conn.close();
+                res(result);
+            });
+        });
+    });
+}
+
+
+module.exports = { mongoFind };
+
