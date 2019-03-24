@@ -21,6 +21,11 @@ const DB_NAME = 'MyDbName';
 /* EndUser Firmware */
 const FIRM_VER = { currentVersion: '1.0.0.1', url: 'www.google.com', launchop: '--updatecheck 60' }; //keeps track of firmware version/URL for firmware
 
+/* HTTPS */
+const HTTPS_MODE = true;
+const HTTPS_KEY_PATH = './https/server.key';
+const HTTPS_CERT_PATH = './https/server.cert';
+
 /*
 //
 // IGNORE
@@ -35,4 +40,4 @@ INSTANCE_COUNT = (INSTANCE_COUNT == -1 || INSTANCE_COUNT > cpuCount) ? cpuCount 
 const COLLECTION_TITLES = ['deployed', 'keyset'];
 
 /* Export config to global scope */
-module.exports = { PORT_NUM, BIND_IP, INSTANCE_COUNT, DB_MODE, DB_CONN_STRING, DB_NAME, COLLECTION_TITLES, FIRM_VER };
+module.exports = { PORT_NUM, BIND_IP, INSTANCE_COUNT, DB_MODE, DB_CONN_STRING, DB_NAME, COLLECTION_TITLES, FIRM_VER, HTTPS_KEY_PATH, HTTPS_CERT_PATH, HTTPS_MODE };
