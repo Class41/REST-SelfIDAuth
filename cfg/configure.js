@@ -19,7 +19,7 @@ const DB_CONN_STRING = 'mongodb://localhost:27017/'; //accepts the following for
 const DB_NAME = 'MyDbName';
 
 /* EndUser Firmware */
-const FIRM_VER = { 'currentVersion': '1.0.0.1', 'url': 'www.google.com', 'launchop': '--updatecheck 60' }; //keeps track of firmware version/URL for firmware
+const FIRM_VER = { currentVersion: '1.0.0.1', url: 'www.google.com', launchop: '--updatecheck 60' }; //keeps track of firmware version/URL for firmware
 
 /*
 //
