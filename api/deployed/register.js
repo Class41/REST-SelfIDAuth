@@ -31,7 +31,7 @@ class Register {
     static searchKeys(uuid, db, cfg, callback) //searches key collection for a specific key
     {
         if (cfg.DB_MODE == 'Mongo')
-            db.mongoFind('keyset', { KEY: uuid })
+            db.dbinc.mongoFind(db.conn, 'keyset', { KEY: uuid })
                 .then((res) => { callback(res); });
         else { console.log('Mock not supported for this operation.'); }
     }
@@ -39,7 +39,7 @@ class Register {
     static deleteKey(uuid, db, cfg, callback) //deletes a key from the key database
     {
         if (cfg.DB_MODE == 'Mongo')
-            db.mongoDelete('keyset', { KEY: uuid })
+            db.dbinc.mongoDelete(db.conn, 'keyset', { KEY: uuid })
                 .then((res) => { callback(res); });
         else { console.log('Mock not supported for this operation.'); }
     }
@@ -47,7 +47,7 @@ class Register {
     static insertDeployments(value, db, cfg, callback) //inserts a new deployment into the deployed collection
     {
         if (cfg.DB_MODE == 'Mongo')
-            db.mongoInsert('deployed', value)
+            db.dbinc.mongoInsert(db.conn, 'deployed', value)
                 .then((res) => { callback(res); });
         else { console.log('Mock not supported for this operation.'); }
     }

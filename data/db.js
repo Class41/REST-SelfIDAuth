@@ -33,7 +33,7 @@ function mongoUpdate(db, collection, filter, values) {
 }
 
 function mongoInsert(db, collection, value) {
-    return new Promise((res) => {
+    return new Promise((res) => { //return promise 
         db.collection(collection).insertOne(value, (err, result) => { //find result, return the value async
             if (err) throw err;
             res(result);
@@ -42,7 +42,7 @@ function mongoInsert(db, collection, value) {
 }
 
 function mongoDelete(db, collection, filter) {
-    return new Promise((res) => {
+    return new Promise((res) => { //return promise 
         db.collection(collection).deleteOne(filter, (err, result) => { //find result, return the value async
             if (err) throw err;
             res(result);
