@@ -8,39 +8,44 @@
 const threads = require('cluster');
 const mutex = require('semaphore')(1);
 const cfg = require('./cfg/configure.js');
-const db = (cfg.DB_MODE == 'Mock') ? require('./data/db_mock') : require('./data/db');
+var dbinc = (cfg.DB_MODE == 'Mock') ? require('./data/db_mock') : require('./data/db');
 
 /* Use this DB instead if you wish to just use a mock database instead */
 //const db = require('./data/db_mock.js');
 
- /* Start Load API Modules */  
+/* Start Load API Modules */
 const module_activated = require("./api/deployed/activated.js");
 const module_register = require("./api/deployed/register.js");
 /* End Loading API Modules */
 
-if(threads.isMaster)
-{
-    threads.on('exit', (worker, code, signal) => { 
+if (threads.isMaster) {
+    threads.on('exit', (worker, code, signal) => {
         threads.fork();                                   //Restart worker thread if a thread dies for some reason
     })
-    
-    for(tcount = 0; tcount < cfg.INSTANCE_COUNT; tcount++) //create worker threads
+
+    for (tcount = 0; tcount < cfg.INSTANCE_COUNT; tcount++) //create worker threads
         threads.fork();
 }
-else 
-{
+else {
     /* Imports / Declares */
     const express = require('express');
     const http = express();
     const bodyParser = require('body-parser');
 
+    if (cfg.DB_MODE == 'Mongo') {
+        dbinc.mongoSessionStart((conn) => {
+            /* Apply modules for Mongo*/
+            new module_activated(http, { dbinc, conn }, cfg, mutex);
+            new module_register(http, { dbinc, conn }, cfg, mutex);
+        });
+    }
+    else {    /* Apply modules for Mock db*/
+        new module_activated(http, dbinc, cfg, mutex);
+        new module_register(http, dbinc, cfg, mutex);
+    }
 
     /* Create a express socket running a json body parser */
     http.use(bodyParser.json());
 
-    /* Apply modules */  
-    new module_activated(http, db, cfg, mutex);
-    new module_register(http, db, cfg, mutex);
-
-    http.listen(cfg.PORT_NUM, cfg.BIND_IP, () => {console.log(`PID: ${process.pid} Starting HTTP server on port ${cfg.PORT_NUM}`)});
+    http.listen(cfg.PORT_NUM, cfg.BIND_IP, () => { console.log(`PID: ${process.pid} Starting HTTP server on port ${cfg.PORT_NUM}`) });
 }

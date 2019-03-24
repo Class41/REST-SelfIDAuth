@@ -7,7 +7,7 @@
 class Activated {
 
     constructor(http, db, cfg, mutex) {
-        /* get */
+        /* GET */
         http.get('/api/activated/:uuid', (req, res) => //handle returning information about a specific UUID
         {
             Activated.searchDeployments(req.params.uuid, db, cfg, (deployEntry) => { //search deployed database, determine if uuid exists
@@ -28,7 +28,7 @@ class Activated {
             });
         });
 
-        /* put */
+        /* PUT */
         http.put('/api/activated/:uuid/ip', (req, res) => //handle updating existing activated units -> ip in particular, automatically detect IP
         {
             Activated.searchDeployments(req.params.uuid, db, cfg, (deployEntry) => { //search deployed database, determine if uuid exists
@@ -38,7 +38,7 @@ class Activated {
                 mutex.take(() => { //ensure no collide on writes
                     Activated.updateDeployment(req.params.uuid, db, cfg, { $set: { ip: req.ip } }, (result) => {
                         if (result.modifiedCount) { res.send('TRUE'); }
-                        else { res.send('FALSE') };                                
+                        else { res.send('FALSE'); }
                         return mutex.leave();
                     });
                 });
@@ -57,7 +57,7 @@ class Activated {
                         mutex.take(() => { //ensure no collide on writes
                             Activated.updateDeployment(req.params.uuid, db, cfg, { $set: { ip: req.body.ip } }, (result) => { //write body ip changes to uuid db entry
                                 if (result.modifiedCount) { res.send('TRUE'); }
-                                else { res.send('FALSE') };                                
+                                else { res.send('FALSE') };
                                 return mutex.leave();
                             });
                         });
@@ -68,7 +68,7 @@ class Activated {
             });
         });
 
-        /* delete */
+        /* DELETE */
         http.delete('/api/activated/:uuid', (req, res) => //handle deactivating activated units, simply mark them as deactivated.
         {
             Activated.searchDeployments(req.params.uuid, db, cfg, (deployEntry) => { //search deployed database, determine if uuid exists
@@ -78,7 +78,7 @@ class Activated {
                 mutex.take(() => { //ensure no collide on writes
                     Activated.updateDeployment(req.params.uuid, db, cfg, { $set: { flag: -1 } }, (result) => { //write body ip changes to uuid db entry
                         if (result.modifiedCount) { res.send('TRUE'); }
-                        else { res.send('FALSE') };                                
+                        else { res.send('FALSE'); }
                         return mutex.leave();
                     });
                 });
@@ -90,13 +90,13 @@ class Activated {
     {
         if (cfg.DB_MODE == 'Mock')
             return console.log('Mock not supported for this operation.');
-        db.mongoUpdate('deployed', { UUID: uuid }, values).then((res) => { callback(res); }); 
+        db.dbinc.mongoUpdate(db.conn, 'deployed', { UUID: uuid }, values).then((res) => { callback(res); });
     }
 
     static searchDeployments(uuid, db, cfg, callback) //check deployment database for a specific uuid entry and return the entry
     {
         if (cfg.DB_MODE == 'Mongo')
-            db.mongoFind('deployed', { UUID: uuid })
+            db.dbinc.mongoFind(db.conn, 'deployed', { UUID: uuid })
                 .then((res) => { callback(res); });
         else { callback(db.deployed.find(data => (data.UUID == uuid && data.flag != -1))); } //'Mock' database support for get
     }
