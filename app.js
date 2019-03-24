@@ -8,14 +8,14 @@
 const threads = require('cluster');
 const mutex = require('semaphore')(1);
 const cfg = require('./cfg/configure.js');
-var dbinc = (cfg.DB_MODE == 'Mock') ? require('./data/db_mock') : require('./data/db');
+const dbinc = (cfg.DB_MODE == 'Mock') ? require('./data/db_mock') : require('./data/db');
 
 /* Use this DB instead if you wish to just use a mock database instead */
 //const db = require('./data/db_mock.js');
 
 /* Start Load API Modules */
-const module_activated = require("./api/deployed/activated.js");
-const module_register = require("./api/deployed/register.js");
+const module_activated = require('./api/deployed/activated.js');
+const module_register = require('./api/deployed/register.js');
 /* End Loading API Modules */
 
 if (threads.isMaster) {
@@ -30,6 +30,8 @@ else {
     /* Imports / Declares */
     const express = require('express');
     const http = express();
+    const https = require('https');
+    const fs = require('fs');
     const bodyParser = require('body-parser');
 
     if (cfg.DB_MODE == 'Mongo') {
@@ -47,5 +49,11 @@ else {
     /* Create a express socket running a json body parser */
     http.use(bodyParser.json());
 
-    http.listen(cfg.PORT_NUM, cfg.BIND_IP, () => { console.log(`PID: ${process.pid} Starting HTTP server on port ${cfg.PORT_NUM}`) });
+    if(cfg.HTTPS_MODE)
+        https.createServer({
+            key: fs.readFileSync(cfg.HTTPS_KEY_PATH),
+            cert: fs.readFileSync(cfg.HTTPS_CERT_PATH)
+        }, http).listen(cfg.PORT_NUM, cfg.BIND_IP, () => { console.log(`PID: ${process.pid} Starting HTTPS server on port ${cfg.PORT_NUM}`) });
+    else
+        http.listen(cfg.PORT_NUM, cfg.BIND_IP, () => { console.log(`PID: ${process.pid} Starting HTTP server on port ${cfg.PORT_NUM}`) });
 }
