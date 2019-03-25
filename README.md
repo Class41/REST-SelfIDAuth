@@ -4,7 +4,7 @@ REST-SelfIDAuth designed for physical clients to be deployed, then connect and c
 
 ## Introduction, Interfaces, and Requirements
 
-[Wiki](https://github.com/Class41/REST-SelfIDAuth/wiki)
+## [Wiki](https://github.com/Class41/REST-SelfIDAuth/wiki)
 
 
 # LICENSE
